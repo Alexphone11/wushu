@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻中心 - 武术社团</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 新闻页面特定样式 */
+        .news-hero {
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1557130641-1b14718f096a?ixlib=rb-1.2.1&auto=format&fit=crop&w=2560&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            margin-top: 80px;
+        }
+
+        .news-filters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--section-background);
+            border-radius: 15px;
+        }
+
+        .news-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .category-btn {
+            background: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .category-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .category-btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 2px solid #d2d2d7;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+        }
+
+        .news-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .news-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 50px;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #d2d2d7;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .page-btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .featured-news {
+            grid-column: span 2;
+            display: flex;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .featured-news:hover {
+            transform: translateY(-10px);
+        }
+
+        .featured-news .news-image {
+            flex: 1;
+            height: auto;
+        }
+
+        .featured-news .news-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .featured-news .news-content h3 {
+            font-size: 24px;
+        }
+
+        .featured-tag {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .news-tag {
+            display: inline-block;
+            background-color: var(--section-background);
+            color: var(--secondary-color);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-right: 5px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 992px) {
+            .featured-news {
+                grid-column: span 1;
+                flex-direction: column;
+            }
+
+            .featured-news .news-image {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .news-filters {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .news-categories {
+                justify-content: center;
+            }
+
+            .search-box {
+                width: 100%;
+                max-width: none;
+            }
+
+            .news-list {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-header">
+                <div class="logo"><i class="fas fa-dragon"></i> 武术社团</div>
+                <button class="nav-toggle" aria-label="切换导航菜单" title="切换导航菜单">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
+                </button>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#home">首页</a></li>
+                <li><a href="index.html#about">关于我们</a></li>
+                <li><a href="index.html#courses">课程介绍</a></li>
+                <li><a href="index.html#masters">名师团队</a></li>
+                <li><a href="media.html">媒体中心</a></li>
+                <li><a href="news.html" class="active">新闻中心</a></li>
+                <li><a href="index.html#contact">联系我们</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="news-hero">
+        <div class="hero-content">
+            <h1>新闻中心</h1>
+            <p>了解武术社团最新动态与活动资讯</p>
+        </div>
+    </section>
+
+    <section class="news-content">
+        <div class="container">
+            <div class="news-filters">
+                <div class="news-categories">
+                    <button class="category-btn active"><i class="fas fa-th"></i> 全部</button>
+                    <button class="category-btn"><i class="fas fa-calendar-alt"></i> 活动</button>
+                    <button class="category-btn"><i class="fas fa-trophy"></i> 比赛</button>
+                    <button class="category-btn"><i class="fas fa-graduation-cap"></i> 培训</button>
+                    <button class="category-btn"><i class="fas fa-bullhorn"></i> 公告</button>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索新闻...">
+                </div>
+            </div>
+
+            <div class="news-list">
+                <article class="featured-news">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1555597673-b21d5c935865?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="武术社团年度表演">
+                    </div>
+                    <div class="news-content">
+                        <span class="featured-tag"><i class="fas fa-star"></i> 精选</span>
+                        <span class="news-tag"><i class="fas fa-calendar-alt"></i> 活动</span>
+                        <span class="news-date">2024-03-15</span>
+                        <h3>武术社团年度表演圆满成功</h3>
+                        <p>本次年度表演展示了各类传统武术项目，包括太极拳、少林功夫、咏春拳等多种武术流派，获得观众一致好评。来自全市各地的武术爱好者齐聚一堂，共同见证了这场精彩的武术盛宴。</p>
+                        <a href="news-detail.html?id=1" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="news-card">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1557130641-1b14718f096a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="武术进校园活动">
+                    </div>
+                    <div class="news-content">
+                        <span class="news-tag"><i class="fas fa-calendar-alt"></i> 活动</span>
+                        <span class="news-date">2024-03-10</span>
+                        <h3>武术进校园活动启动</h3>
+                        <p>为推广传统武术文化，我们开展了武术进校园系列活动，让更多青少年了解和体验中华武术的魅力...</p>
+                        <a href="news-detail.html?id=2" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="news-card">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1552072092-7f9b8d63efcb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="武术大师讲座">
+                    </div>
+                    <div class="news-content">
+                        <span class="news-tag"><i class="fas fa-graduation-cap"></i> 培训</span>
+                        <span class="news-date">2024-03-05</span>
+                        <h3>王大师太极拳专题讲座</h3>
+                        <p>著名太极拳大师王师傅将于下周六在我社团举办太极拳专题讲座，分享太极拳的精髓和健康养生之道...</p>
+                        <a href="news-detail.html?id=3" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="news-card">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1590556409324-aa1d726e5c3c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="武术比赛">
+                    </div>
+                    <div class="news-content">
+                        <span class="news-tag"><i class="fas fa-trophy"></i> 比赛</span>
+                        <span class="news-date">2024-02-28</span>
+                        <h3>我社团在市武术锦标赛中获佳绩</h3>
+                        <p>在刚刚结束的市武术锦标赛中，我社团选手表现出色，共获得5金3银2铜的优异成绩，展现了扎实的武术功底...</p>
+                        <a href="news-detail.html?id=4" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="news-card">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="新课程公告">
+                    </div>
+                    <div class="news-content">
+                        <span class="news-tag"><i class="fas fa-bullhorn"></i> 公告</span>
+                        <span class="news-date">2024-02-20</span>
+                        <h3>2024年春季新课程开放报名</h3>
+                        <p>我社团2024年春季新课程现已开放报名，包括太极拳、少林功夫、咏春拳等多个班级，欢迎各年龄段武术爱好者加入...</p>
+                        <a href="news-detail.html?id=5" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="news-card">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="武术文化讲座">
+                    </div>
+                    <div class="news-content">
+                        <span class="news-tag"><i class="fas fa-graduation-cap"></i> 培训</span>
+                        <span class="news-date">2024-02-15</span>
+                        <h3>中华武术文化系列讲座成功举办</h3>
+                        <p>我社团联合市文化馆举办的"中华武术文化系列讲座"圆满结束，吸引了众多武术爱好者和文化研究者参与...</p>
+                        <a href="news-detail.html?id=6" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+            </div>
+
+            <div class="news-pagination">
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn"><i class="fas fa-ellipsis-h"></i></button>
+                <button class="page-btn">10</button>
+                <button class="page-btn"><i class="fas fa-angle-right"></i></button>
+            </div>
+        </div>  
+    </section>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3><i class="fas fa-dragon"></i> 武术社团</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 地址：XX市XX区XX街XX号</p>
+                    <p><i class="fas fa-phone"></i> 电话：XXX-XXXX-XXXX</p>
+                    <p><i class="fas fa-envelope"></i> 邮箱：contact@wushu.com</p>
+                </div>
+                <div class="footer-links">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html#home"><i class="fas fa-chevron-right"></i> 首页</a></li>
+                        <li><a href="index.html#about"><i class="fas fa-chevron-right"></i> 关于我们</a></li>
+                        <li><a href="index.html#courses"><i class="fas fa-chevron-right"></i> 课程介绍</a></li>
+                        <li><a href="index.html#masters"><i class="fas fa-chevron-right"></i> 名师团队</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h3>关注我们</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 武术社团. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
